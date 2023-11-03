@@ -1,0 +1,71 @@
+{% extends 'base.html'%}
+{% block title %}Market Page{% endblock %}
+{% block content%}
+<div class="row" style="margin-top:20px; margin-left:20px">
+    <div class="col-8">
+         <h2>Available items on the Market</h2>
+       <p>Click on one of the items to start buying</p>
+       <br>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Id</th>
+                    <th scope="col">name</th>
+                    <th scope="col">Barcode</th>
+                    <th scope="col">Price</th>
+                    <th scope="col" class="text-center">Options</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <th scope="row">{{item.id}}</th>
+                    <td>{{item.name}}</td>
+                    <td>{{item.barcode}}</td>
+                    <td>{{item.price}}$</td>
+                    <td class="d-flex justify-content-around">
+                        <button class="btn btn-outline btn-info" data-bs-toggle="modal" data-bs-target="#Modal-MoreInfo-{{ item.id }}">More Info</button>
+                        <button class="btn btn-outline btn-success" data-bs-toggle="modal" data-bs-target="#Modal-PurchaseConfirm-{{ item.id }}">Purchase this Item</button>
+                    </td>
+                </tr>
+
+                {% include 'utils/modal.html' %}
+
+
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col-4">
+                <h2>Owned Items</h2>
+        <p>Click on sell item to put an item back on the Market</p>
+        <br>
+
+ <table class="table">
+    <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Barcode</th>
+        <th scope="col">Price</th>
+        <th scope="col" class="text-center">Options</th>
+    </tr>
+
+    {% for owned_item in owned_items %}
+    <tr>
+        <td>{{ owned_item.name }}</td>
+        <td>{{ owned_item.barcode }}</td>
+        <td>{{ owned_item.price }}$</td>
+      <td>
+  <div class="d-flex flex-column gap-2">
+<!--        <button class="btn btn-outline btn-info" data-bs-toggle="modal" data-bs-target="#Modal-MoreInfo-{{ owned_item.id }}">More Info</button>-->
+        <button class="btn btn-outline btn-danger" data-bs-toggle="modal" data-bs-target="#Modal-SellingConfirm-{{ owned_item.id }}">Sell this Item</button>
+    </div>
+</td>
+
+    </tr>
+     {% include 'utils/owned_items.html' %}
+    {% endfor %}
+</table>
+
+    </div>
+</div>
+{%endblock%}
