@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash,request
+from flask import render_template, redirect, url_for, flash,request,jsonify
 from market.models import items, User
 from market.forms import RegisterForm, LoginForm,PurchaseItemForm,SellItemForm
 from market import db,app
@@ -93,3 +93,62 @@ class HomeController:
         print("logout Controller")
         flash("You have been logged out!", category='info')
         return redirect(url_for("home_page"))
+
+    def create_product(self):
+        data = request.get_json()  # Get JSON data from the request
+
+        # Extract product details from the JSON data
+        name = data.get('name')
+        price = data.get('price')
+        barcode = data.get('barcode')
+        description = data.get('description')
+
+        if not all([name, price, barcode, description]):
+            return jsonify({'error': 'Incomplete data provided'}), 400
+
+        # Create a new item
+        new_item = items(
+            name=name,
+            price=price,
+            barcode=barcode,
+            description=description
+        )
+
+        try:
+            with app.app_context():
+                # Add the new item to the session
+                db.session.add(new_item)
+
+                # Commit the changes to the database
+                db.session.commit()
+
+                return jsonify({'message': 'Product added successfully'})
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+
+    def update_item(self, item_id, data):
+        item = items.query.get_or_404(item_id)
+
+        if data.get('name'):
+            item.name = data['name']
+
+        if data.get('price'):
+            item.price = data['price']
+
+        if data.get('barcode'):
+            item.barcode = data['barcode']
+
+        if data.get('description'):
+            item.description = data['description']
+
+        db.session.commit()
+
+        return {'message': f'Item {item_id} has been updated.'}, 200
+
+    def delete_item(self, item_id):
+        # Logic to delete the item with ID item_id from the database
+        # Perform the deletion operation using your ORM or database library
+        item = items.query.get(item_id)
+        db.session.delete(item)
+        db.session.commit()
+        return f"Item with ID {item_id} deleted successfully"
